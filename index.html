@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProposalAI - AI-Powered Proposal Generation Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .purple-gradient {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+        }
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pulse-border {
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { border-color: #8b5cf6; }
+            50% { border-color: #a855f7; }
+            100% { border-color: #8b5cf6; }
+        }
+        .video-container {
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+            border: 2px dashed #9ca3af;
+        }
+        @media print {
+            body { margin: 0 !important; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Analytics tracking hook
+        const useAnalytics = () => {
+            const trackEvent = (eventName, properties = {}) => {
+                console.log('Analytics Event:', eventName, properties);
+                // Integration point for analytics services
+            };
+
+            const trackVideoPlay = (videoId) => {
+                trackEvent('video_play', { video_id: videoId });
+            };
+
+            const trackFormSubmit = (formData) => {
+                trackEvent('form_submit', formData);
+            };
+
+            const trackCTAClick = (ctaLocation) => {
+                trackEvent('cta_click', { location: ctaLocation });
+            };
+
+            return { trackEvent, trackVideoPlay, trackFormSubmit, trackCTAClick };
+        };
+
+        // Hero Section Component
+        const HeroSection = ({ onCTAClick }) => {
+            return (
+                <section className="gradient-bg text-white py-20">
+                    <div className="container mx-auto px-6 text-center">
+                        <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                            Generate Winning Proposals
+                            <span className="block text-yellow-300">10x Faster</span>
+                        </h1>
+                        <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed">
+                            Transform your RFPs into compelling proposals with AI-powered insights, 
+                            automated generation, and data-driven recommendations that win more deals.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                            <button 
+                                onClick={() => onCTAClick('hero')}
+                                className="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors pulse-border border-2"
+                            >
+                                <i className="fas fa-rocket mr-2"></i>
+                                Start Free Trial
+                            </button>
+                            <p className="text-sm opacity-90">
+                                <i className="fas fa-check mr-1"></i>
+                                30-day free trial • No credit card required
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Video Section Component
+        const VideoSection = ({ analytics }) => {
+            const videoRef = useRef(null);
+
+            const handleVideoPlay = () => {
+                analytics.trackVideoPlay('main-demo');
+            };
+
+            return (
+                <section className="py-16 bg-white">
+                    <div className="container mx-auto px-6">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                See ProposalAI in Action
+                            </h2>
+                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                                Watch how our AI transforms complex RFPs into winning proposals in minutes
+                            </p>
+                        </div>
+                        <div className="max-w-4xl mx-auto">
+                            <div className="video-container rounded-lg p-8 text-center">
+                                <div className="bg-purple-100 rounded-lg p-12">
+                                    <i className="fas fa-play-circle text-purple-600 text-6xl mb-4"></i>
+                                    <h3 className="text-2xl font-semibold text-purple-800 mb-2">
+                                        Product Demo Video
+                                    </h3>
+                                    <p className="text-purple-600">
+                                        Interactive demo showcasing proposal generation workflow
+                                    </p>
+                                    <button 
+                                        onClick={handleVideoPlay}
+                                        className="mt-4 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+                                    >
+                                        <i className="fas fa-play mr-2"></i>
+                                        Watch Demo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Features Section Component
+        const FeaturesSection = () => {
+            const features = [
+                {
+                    icon: 'fas fa-magic',
+                    title: 'AI Proposal Generation',
+                    description: 'Generate customized proposals based on your input parameters, client requirements, and industry best practices.',
+                    benefits: ['90% faster creation', 'Industry-specific templates', 'Smart content suggestions']
+                },
+                {
+                    icon: 'fas fa-file-alt',
+                    title: 'RFP Processing',
+                    description: 'Automatically extract key information from RFPs, identify requirements, and create structured response frameworks.',
+                    benefits: ['Auto requirement extraction', 'Compliance checking', 'Risk assessment']
+                },
+                {
+                    icon: 'fas fa-lightbulb',
+                    title: 'Smart Recommendations',
+                    description: 'Leverage your proposal history to suggest winning strategies and content based on similar past proposals.',
+                    benefits: ['Historical analysis', 'Success pattern detection', 'Content optimization']
+                }
+            ];
+
+            return (
+                <section className="py-16 bg-gray-50">
+                    <div className="container mx-auto px-6">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                Everything You Need to Win More Deals
+                            </h2>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                Our comprehensive platform streamlines your entire proposal process from RFP analysis to final submission
+                            </p>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {features.map((feature, index) => (
+                                <div key={index} className="feature-card bg-white rounded-lg p-8 shadow-lg">
+                                    <div className="text-center mb-6">
+                                        <div className="purple-gradient w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <i className={`${feature.icon} text-white text-2xl`}></i>
+                                        </div>
+                                        <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-gray-600 mb-6">
+                                            {feature.description}
+                                        </p>
+                                    </div>
+                                    <ul className="space-y-3">
+                                        {feature.benefits.map((benefit, idx) => (
+                                            <li key={idx} className="flex items-center text-gray-700">
+                                                <i className="fas fa-check text-purple-600 mr-3"></i>
+                                                {benefit}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Stats Section Component
+        const StatsSection = () => {
+            const stats = [
+                { number: '90%', label: 'Faster Proposal Creation' },
+                { number: '75%', label: 'Higher Win Rate' },
+                { number: '50+', label: 'Industry Templates' },
+                { number: '99.9%', label: 'Uptime Guarantee' }
+            ];
+
+            return (
+                <section className="py-16 purple-gradient text-white">
+                    <div className="container mx-auto px-6">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold mb-4">
+                                Proven Results for Growing Teams
+                            </h2>
+                            <p className="text-xl opacity-90">
+                                Join thousands of businesses winning more deals with ProposalAI
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            {stats.map((stat, index) => (
+                                <div key={index} className="text-center">
+                                    <div className="text-4xl md:text-5xl font-bold mb-2">
+                                        {stat.number}
+                                    </div>
+                                    <div className="text-lg opacity-90">
+                                        {stat.label}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Lead Capture Form Component
+        const LeadCaptureForm = ({ analytics, onCTAClick }) => {
+            const [formData, setFormData] = useState({
+                name: '',
+                email: '',
+                company: '',
+                frequency: ''
+            });
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [isSubmitted, setIsSubmitted] = useState(false);
+
+            const handleInputChange = (e) => {
+                setFormData({
+                    ...formData,
+                    [e.target.name]: e.target.value
+                });
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setIsSubmitting(true);
+                
+                // Track form submission
+                analytics.trackFormSubmit(formData);
+                
+                // Simulate API call
+                setTimeout(() => {
+                    setIsSubmitting(false);
+                    setIsSubmitted(true);
+                }, 1000);
+            };
+
+            if (isSubmitted) {
+                return (
+                    <section className="py-20 bg-white">
+                        <div className="container mx-auto px-6 text-center">
+                            <div className="max-w-2xl mx-auto">
+                                <div className="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                                    <i className="fas fa-check text-green-600 text-3xl"></i>
+                                </div>
+                                <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                    Welcome to ProposalAI!
+                                </h2>
+                                <p className="text-xl text-gray-600 mb-8">
+                                    Thank you for signing up. Check your email for next steps to start your free trial.
+                                </p>
+                                <button 
+                                    onClick={() => onCTAClick('success')}
+                                    className="purple-gradient text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity"
+                                >
+                                    <i className="fas fa-arrow-right mr-2"></i>
+                                    Access Your Dashboard
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                );
+            }
+
+            return (
+                <section className="py-20 bg-white">
+                    <div className="container mx-auto px-6">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="text-center mb-12">
+                                <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                    Start Your Free 30-Day Trial
+                                </h2>
+                                <p className="text-xl text-gray-600">
+                                    Join thousands of professionals creating winning proposals with AI
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 rounded-lg p-8 md:p-12">
+                                <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Full Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            required
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="Enter your full name"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Work Email *
+                                        </label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            required
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="Enter your work email"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Company Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="company"
+                                            value={formData.company}
+                                            onChange={handleInputChange}
+                                            required
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            placeholder="Enter your company name"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Proposal Frequency
+                                        </label>
+                                        <select
+                                            name="frequency"
+                                            value={formData.frequency}
+                                            onChange={handleInputChange}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        >
+                                            <option value="">Select frequency</option>
+                                            <option value="weekly">Weekly (5+ proposals)</option>
+                                            <option value="monthly">Monthly (1-4 proposals)</option>
+                                            <option value="quarterly">Quarterly</option>
+                                            <option value="as-needed">As needed</option>
+                                        </select>
+                                    </div>
+                                    <div className="md:col-span-2 text-center">
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="purple-gradient text-white px-12 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isSubmitting ? (
+                                                <>
+                                                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                                                    Setting up your trial...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fas fa-rocket mr-2"></i>
+                                                    Start Free Trial
+                                                </>
+                                            )}
+                                        </button>
+                                        <p className="text-sm text-gray-500 mt-4">
+                                            <i className="fas fa-lock mr-1"></i>
+                                            No credit card required • Cancel anytime • GDPR compliant
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Benefits Section Component
+        const BenefitsSection = () => {
+            const benefits = [
+                {
+                    title: 'Save 20+ Hours Per Proposal',
+                    description: 'Automate repetitive tasks and focus on strategy and client relationships instead of formatting and writing.',
+                    icon: 'fas fa-clock'
+                },
+                {
+                    title: 'Increase Win Rates by 75%',
+                    description: 'Use data-driven insights and proven templates to create more compelling and competitive proposals.',
+                    icon: 'fas fa-trophy'
+                },
+                {
+                    title: 'Scale Your Business',
+                    description: 'Handle more RFPs without hiring additional staff. Grow your revenue without growing your overhead.',
+                    icon: 'fas fa-chart-line'
+                },
+                {
+                    title: 'Reduce Human Error',
+                    description: 'Eliminate costly mistakes with automated compliance checking and requirement verification.',
+                    icon: 'fas fa-shield-alt'
+                }
+            ];
+
+            return (
+                <section className="py-16 bg-white">
+                    <div className="container mx-auto px-6">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                Transform Your Proposal Process
+                            </h2>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                Stop losing deals to competitors. Start winning with AI-powered proposals that convert.
+                            </p>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-12">
+                            {benefits.map((benefit, index) => (
+                                <div key={index} className="flex items-start space-x-6">
+                                    <div className="purple-gradient w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i className={`${benefit.icon} text-white text-xl`}></i>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                                            {benefit.title}
+                                        </h3>
+                                        <p className="text-gray-600 text-lg leading-relaxed">
+                                            {benefit.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Footer Component
+        const Footer = () => {
+            return (
+                <footer className="bg-gray-900 text-white py-12">
+                    <div className="container mx-auto px-6">
+                        <div className="text-center">
+                            <div className="mb-8">
+                                <h3 className="text-2xl font-bold mb-2">ProposalAI</h3>
+                                <p className="text-gray-400">
+                                    AI-Powered Proposal Generation Platform
+                                </p>
+                            </div>
+                            <div className="flex justify-center space-x-8 mb-8">
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                                    <i className="fab fa-linkedin text-2xl"></i>
+                                </a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                                    <i className="fab fa-twitter text-2xl"></i>
+                                </a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                                    <i className="fab fa-facebook text-2xl"></i>
+                                </a>
+                            </div>
+                            <div className="border-t border-gray-800 pt-8">
+                                <p className="text-gray-400">
+                                    © 2024 ProposalAI. All rights reserved. • Privacy Policy • Terms of Service
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        // Main Landing Page Component
+        const LandingPage = () => {
+            const analytics = useAnalytics();
+            const [abTestVariant] = useState('A'); // Hook for A/B testing
+
+            const handleCTAClick = (location) => {
+                analytics.trackCTAClick(location);
+                // Handle CTA action (e.g., scroll to form, open modal, redirect)
+                if (location === 'hero') {
+                    document.getElementById('lead-form').scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+
+            useEffect(() => {
+                // Track page load
+                analytics.trackEvent('page_load', { variant: abTestVariant });
+            }, []);
+
+            return (
+                <div className="min-h-screen">
+                    <HeroSection onCTAClick={handleCTAClick} />
+                    <VideoSection analytics={analytics} />
+                    <FeaturesSection />
+                    <BenefitsSection />
+                    <StatsSection />
+                    <div id="lead-form">
+                        <LeadCaptureForm analytics={analytics} onCTAClick={handleCTAClick} />
+                    </div>
+                    <Footer />
+                </div>
+            );
+        };
+
+        // Render the application
+        ReactDOM.render(<LandingPage />, document.getElementById('root'));
+    </script>
+</body>
+</html>
